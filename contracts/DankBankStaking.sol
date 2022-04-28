@@ -8,10 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // Inheritance
 import "./RewardsDistributionRecipient.sol";
 import "./Pausable.sol";
-import "./IStakingRewards.sol";
 
-// https://docs.synthetix.io/contracts/source/contracts/stakingrewards
-contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, ReentrancyGuard, Pausable {
+contract StakingRewards is RewardsDistributionRecipient, ReentrancyGuard, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -40,7 +38,6 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
     ) Owned(_owner) {
         rewardsToken = _rewardsToken;
         stakingToken = IERC20(_stakingToken);
-        rewardsDistribution = msg.sender;
         rewardRate = rewardRate;
         periodFinish = periodFinish;
     }
@@ -82,18 +79,6 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function changeRewardToken(address _tokenAddress) external onlyOwner {
-        rewardsToken = _tokenAddress;
-    }
-
-    function changeRewardRate(uint256 _rate) external onlyOwner {
-        rewardRate = _rate;
-    }
-
-    function changePeriodFinish(uint256 _periodFinish) external onlyOwner {
-        periodFinish = _periodFinish;
-    }
-
     function stake(uint256 amount) external nonReentrant notPaused updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
@@ -126,7 +111,7 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
 
     /* ========== RESTRICTED FUNCTIONS ========== */
 
-    function notifyRewardAmount(uint256 reward) override external onlyRewardsDistribution updateReward(address(0)) {
+    function notifyRewardAmount(uint256 reward) external override onlyRewardsDistribution updateReward(address(0)) {
         if (block.timestamp >= periodFinish) {
             rewardRate = reward.div(rewardsDuration);
         } else {
@@ -163,6 +148,23 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
         emit RewardsDurationUpdated(rewardsDuration);
     }
 
+    function setRewardToken(address _tokenAddress) external onlyOwner {
+        require(_tokenAddress != address(0), "Cannot set the reward token to 0 address");
+        rewardsToken = _tokenAddress;
+        emit RewardTokenUpdated(_tokenAddress);
+    }
+
+    function setRewardRate(uint256 _rate) external onlyOwner {
+        rewardRate = _rate;
+        emit RewardRateUpdated(_rate);
+    }
+
+    function setPeriodFinish(uint256 _periodFinish) external onlyOwner {
+        require(periodFinish < _periodFinish, "New period finish must be after the current period finish");
+        periodFinish = _periodFinish;
+        emit PeriodFinishUpdated(_periodFinish);
+    }
+
     /* ========== MODIFIERS ========== */
 
     modifier updateReward(address account) {
@@ -183,4 +185,7 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
     event RewardPaid(address indexed user, uint256 reward);
     event RewardsDurationUpdated(uint256 newDuration);
     event Recovered(address token, uint256 amount);
+    event RewardTokenUpdated(address token);
+    event RewardRateUpdated(uint256 rate);
+    event PeriodFinishUpdated(uint256 periodFinish);
 }
