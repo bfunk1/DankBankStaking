@@ -71,8 +71,10 @@ if (defenderApiKey && defenderSecret) {
 
 // Bug in hardhat that doesn't allow us to multiple keys for different networks.
 const etherscanKey = process.env.ETHERSCAN_API_KEY;
-// const polyscanKey = process.env.POLYSCAN_API_KEY;
-const etherscanSettings = { etherscan: { apiKey: etherscanKey } };
+const polyscanKey = process.env.POLYSCAN_API_KEY;
+const etherscanSettings = {
+    etherscan: { apiKey: { mainnet: etherscanKey, polygon: polyscanKey, polygonMumbai: polyscanKey } },
+};
 
 function createNetworkConfig(network: keyof typeof chainIds): NetworkUserConfig {
     let url: string = infuraUrl[network];
@@ -90,7 +92,7 @@ function createNetworkConfig(network: keyof typeof chainIds): NetworkUserConfig 
     };
 }
 
-const config: HardhatUserConfig = {
+const config: any = {
     defaultNetwork: "hardhat",
     namedAccounts: {
         deployer: 0, // Do not use this account for testing

@@ -4,12 +4,13 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 // Inheritance
 import "./RewardsDistributionRecipient.sol";
 import "./Pausable.sol";
 
-contract StakingRewards is RewardsDistributionRecipient, ReentrancyGuard, Pausable {
+contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -17,7 +18,7 @@ contract StakingRewards is RewardsDistributionRecipient, ReentrancyGuard, Pausab
 
     address public rewardsToken;
     IERC20 public stakingToken;
-    uint256 public periodFinish = 156 weeks;
+    uint256 public periodFinish;
     uint256 public rewardRate = 10;
     uint256 public rewardsDuration = 1 hours;
     uint256 public lastUpdateTime;
@@ -29,6 +30,18 @@ contract StakingRewards is RewardsDistributionRecipient, ReentrancyGuard, Pausab
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
 
+    /* ========== EVENTS ========== */
+
+    event RewardAdded(uint256 reward);
+    event Staked(address indexed user, uint256 amount);
+    event Withdrawn(address indexed user, uint256 amount);
+    event RewardPaid(address indexed user, uint256 reward);
+    event RewardsDurationUpdated(uint256 newDuration);
+    event Recovered(address token, uint256 amount);
+    event RewardTokenUpdated(address token);
+    event RewardRateUpdated(uint256 rate);
+    event PeriodFinishUpdated(uint256 periodFinish);
+
     /* ========== CONSTRUCTOR ========== */
 
     constructor(
@@ -38,8 +51,7 @@ contract StakingRewards is RewardsDistributionRecipient, ReentrancyGuard, Pausab
     ) Owned(_owner) {
         rewardsToken = _rewardsToken;
         stakingToken = IERC20(_stakingToken);
-        rewardRate = rewardRate;
-        periodFinish = periodFinish;
+        periodFinish = block.timestamp + 156 weeks;
     }
 
     /* ========== VIEWS ========== */
@@ -176,16 +188,4 @@ contract StakingRewards is RewardsDistributionRecipient, ReentrancyGuard, Pausab
         }
         _;
     }
-
-    /* ========== EVENTS ========== */
-
-    event RewardAdded(uint256 reward);
-    event Staked(address indexed user, uint256 amount);
-    event Withdrawn(address indexed user, uint256 amount);
-    event RewardPaid(address indexed user, uint256 reward);
-    event RewardsDurationUpdated(uint256 newDuration);
-    event Recovered(address token, uint256 amount);
-    event RewardTokenUpdated(address token);
-    event RewardRateUpdated(uint256 rate);
-    event PeriodFinishUpdated(uint256 periodFinish);
 }
