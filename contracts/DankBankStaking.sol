@@ -2,6 +2,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/interfaces/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -16,8 +17,9 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
 
     /* ========== STATE VARIABLES ========== */
 
+    IERC1155 public stakingLPToken;
     address public rewardsToken;
-    IERC20 public stakingToken;
+    uint256 public lpTokenId;
     uint256 public periodFinish;
     uint256 public rewardRate = 10;
     uint256 public rewardsDuration = 1 hours;
@@ -47,10 +49,12 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     constructor(
         address _owner,
         address _rewardsToken,
-        address _stakingToken
+        address _stakingToken,
+        uint256 _lpTokenId
     ) Owned(_owner) {
         rewardsToken = _rewardsToken;
-        stakingToken = IERC20(_stakingToken);
+        stakingLPToken = IERC1155(_stakingToken);
+        lpTokenId = _lpTokenId;
         periodFinish = block.timestamp + 156 weeks;
     }
 
@@ -95,7 +99,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        stakingToken.safeTransferFrom(msg.sender, address(this), amount);
+        stakingLPToken.safeTransferFrom(msg.sender, address(this), lpTokenId, amount, "");
         emit Staked(msg.sender, amount);
     }
 
@@ -103,7 +107,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        stakingToken.safeTransfer(msg.sender, amount);
+        stakingLPToken.safeTransferFrom(address(this), msg.sender, lpTokenId, amount, "");
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -146,7 +150,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
 
     // Added to support recovering LP Rewards from other systems such as BAL to be distributed to holders
     function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {
-        require(tokenAddress != address(stakingToken), "Cannot withdraw the staking token");
+        require(tokenAddress != address(stakingLPToken), "Cannot withdraw the staking token");
         IERC20(tokenAddress).safeTransfer(owner, tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
