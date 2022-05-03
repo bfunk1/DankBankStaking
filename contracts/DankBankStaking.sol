@@ -21,7 +21,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     address public rewardsToken;
     uint256 public lpTokenId;
     uint256 public periodFinish;
-    uint256 public rewardRate = 10;
+    uint256 public rewardRate;
     uint256 public rewardsDuration = 1 hours;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
@@ -50,12 +50,14 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
         address _owner,
         address _rewardsToken,
         address _stakingToken,
-        uint256 _lpTokenId
+        uint256 _lpTokenId,
+        uint256 _rewardRate
     ) Owned(_owner) {
         rewardsToken = _rewardsToken;
         stakingLPToken = IERC1155(_stakingToken);
         lpTokenId = _lpTokenId;
         periodFinish = block.timestamp + 156 weeks;
+        rewardRate = _rewardRate;
     }
 
     /* ========== VIEWS ========== */
