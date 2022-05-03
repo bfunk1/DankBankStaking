@@ -10,6 +10,8 @@
     "deploy": "hardhat run scripts/deploy.ts",
     "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai",
     "deploy:matic": "hardhat run scripts/deploy.ts --network matic",
+    "deploy:factory:mumbai": "hardhat run scripts/deployFactory.ts --network mumbai",
+    "deploy:factory:matic": "hardhat run scripts/deployFactory.ts --network matic",
     "start": "hardhat node",
     "storage-layout": "hardhat run scripts/storageLayout.ts",
     "lint": "yarn run lint:sol && yarn run lint:ts && yarn run prettier:check",
