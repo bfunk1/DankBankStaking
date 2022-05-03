@@ -20,13 +20,15 @@ contract DankBankStakingFactory is AccessControl {
         address _owner,
         address _rewardsToken,
         address _stakingToken,
-        uint256 _lpTokenId
+        uint256 _lpTokenId,
+        uint256 _rewardRate
     ) external onlyRole(FACTORY_ADMIN_ROLE) {
         DankBankStaking newDankBankStakingContract = new DankBankStaking(
             _owner,
             _rewardsToken,
             _stakingToken,
-            _lpTokenId
+            _lpTokenId,
+            _rewardRate
         );
         stakingContractAddresses[_stakingToken] = address(newDankBankStakingContract);
         emit Build(address(newDankBankStakingContract));
