@@ -6,7 +6,7 @@ import "./DankBankStaking.sol";
 
 contract DankBankStakingFactory is AccessControl {
     bytes32 public constant FACTORY_ADMIN_ROLE = keccak256("FACTORY ADMIN");
-    event Build(address newStakingContract);
+    event Build(address indexed newStakingContract, address stakingToken, uint256 rewardRate);
     event AdminRoleGranted(address indexed beneficiary, address indexed caller);
 
     mapping(address => address) public stakingContractAddresses;
@@ -31,7 +31,7 @@ contract DankBankStakingFactory is AccessControl {
             _rewardRate
         );
         stakingContractAddresses[_stakingToken] = address(newDankBankStakingContract);
-        emit Build(address(newDankBankStakingContract));
+        emit Build(address(newDankBankStakingContract), _stakingToken, _rewardRate);
     }
 
     function isAdmin(address _address) public view returns (bool) {
