@@ -18,6 +18,7 @@ contract DankBankStakingFactory is AccessControl {
 
     function build(
         address _owner,
+        address _memeToken,
         address _rewardsToken,
         address _stakingToken,
         uint256 _lpTokenId,
@@ -25,6 +26,7 @@ contract DankBankStakingFactory is AccessControl {
     ) external onlyRole(FACTORY_ADMIN_ROLE) {
         DankBankStaking newDankBankStakingContract = new DankBankStaking(
             _owner,
+            _memeToken,
             _rewardsToken,
             _stakingToken,
             _lpTokenId,
