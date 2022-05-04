@@ -18,7 +18,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     /* ========== STATE VARIABLES ========== */
 
     IERC1155 public stakingLPToken;
-    address public rewardsToken;
+    address public rewardToken;
     address public memeToken;
     uint256 public lpTokenId;
     uint256 public periodFinish;
@@ -50,12 +50,12 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     constructor(
         address _owner,
         address _memeToken,
-        address _rewardsToken,
+        address _rewardToken,
         address _stakingToken,
         uint256 _lpTokenId,
         uint256 _rewardRate
     ) Owned(_owner) {
-        rewardsToken = _rewardsToken;
+        rewardToken = _rewardToken;
         memeToken = _memeToken;
         stakingLPToken = IERC1155(_stakingToken);
         lpTokenId = _lpTokenId;
@@ -90,7 +90,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     function earned(address account) public view returns (uint256) {
         return
             _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(
-                rewards[rewardsToken][account]
+                rewards[rewardToken][account]
             );
     }
 
@@ -117,10 +117,10 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     }
 
     function getReward() public nonReentrant updateReward(msg.sender) {
-        uint256 reward = rewards[rewardsToken][msg.sender];
+        uint256 reward = rewards[rewardToken][msg.sender];
         if (reward > 0) {
-            rewards[rewardsToken][msg.sender] = 0;
-            IERC20(rewardsToken).safeTransfer(msg.sender, reward);
+            rewards[rewardToken][msg.sender] = 0;
+            IERC20(rewardToken).safeTransfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);
         }
     }
@@ -145,7 +145,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
         // This keeps the reward rate in the right range, preventing overflows due to
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
-        uint256 balance = IERC20(rewardsToken).balanceOf(address(this));
+        uint256 balance = IERC20(rewardToken).balanceOf(address(this));
         require(rewardRate <= balance.div(rewardsDuration), "Provided reward too high");
 
         lastUpdateTime = block.timestamp;
@@ -171,7 +171,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
 
     function setRewardToken(address _tokenAddress) external onlyOwner {
         require(_tokenAddress != address(0), "Cannot set the reward token to 0 address");
-        rewardsToken = _tokenAddress;
+        rewardToken = _tokenAddress;
         emit RewardTokenUpdated(_tokenAddress);
     }
 
@@ -192,7 +192,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = lastTimeRewardApplicable();
         if (account != address(0)) {
-            rewards[rewardsToken][account] = earned(account);
+            rewards[rewardToken][account] = earned(account);
             userRewardPerTokenPaid[account] = rewardPerTokenStored;
         }
         _;

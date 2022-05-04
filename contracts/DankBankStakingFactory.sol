@@ -9,6 +9,7 @@ contract DankBankStakingFactory is AccessControl {
     event Build(
         address indexed newStakingContract,
         address memeToken,
+        address rewardToken,
         address stakingToken,
         uint256 lpTokenId,
         uint256 rewardRate
@@ -25,7 +26,7 @@ contract DankBankStakingFactory is AccessControl {
     function build(
         address _owner,
         address _memeToken,
-        address _rewardsToken,
+        address _rewardToken,
         address _stakingToken,
         uint256 _lpTokenId,
         uint256 _rewardRate
@@ -33,13 +34,20 @@ contract DankBankStakingFactory is AccessControl {
         DankBankStaking newDankBankStakingContract = new DankBankStaking(
             _owner,
             _memeToken,
-            _rewardsToken,
+            _rewardToken,
             _stakingToken,
             _lpTokenId,
             _rewardRate
         );
         stakingContractAddresses[_stakingToken] = address(newDankBankStakingContract);
-        emit Build(address(newDankBankStakingContract), _memeToken, _stakingToken, _lpTokenId, _rewardRate);
+        emit Build(
+            address(newDankBankStakingContract),
+            _rewardToken,
+            _memeToken,
+            _stakingToken,
+            _lpTokenId,
+            _rewardRate
+        );
     }
 
     function isAdmin(address _address) public view returns (bool) {
