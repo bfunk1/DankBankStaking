@@ -39,7 +39,7 @@ contract DankBankStakingFactory is AccessControl {
             _lpTokenId,
             _rewardRate
         );
-        stakingContractAddresses[_stakingToken] = address(newDankBankStakingContract);
+        stakingContractAddresses[_memeToken] = address(newDankBankStakingContract);
         emit Build(
             address(newDankBankStakingContract),
             _rewardToken,
