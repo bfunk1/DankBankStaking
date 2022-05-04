@@ -10,7 +10,7 @@ async function main() {
 
     const dankBankStakingFactory = await DankBankStakingFactory.deploy(deployer.address);
 
-    console.log(`Merkle Claim Factory Address: ${dankBankStakingFactory.address}`);
+    console.log(`Dank Bank Staking Factory Address: ${dankBankStakingFactory.address}`);
 }
 
 main().catch(error => {
