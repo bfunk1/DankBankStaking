@@ -27,7 +27,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     uint256 public rewardPerTokenStored;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
-    mapping(address => uint256) public rewards;
+    mapping(address => mapping(address => uint256)) public rewards;
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
@@ -87,7 +87,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     function earned(address account) public view returns (uint256) {
         return
             _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(
-                rewards[account]
+                rewards[rewardsToken][account]
             );
     }
 
@@ -114,9 +114,9 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
     }
 
     function getReward() public nonReentrant updateReward(msg.sender) {
-        uint256 reward = rewards[msg.sender];
+        uint256 reward = rewards[rewardsToken][msg.sender];
         if (reward > 0) {
-            rewards[msg.sender] = 0;
+            rewards[rewardsToken][msg.sender] = 0;
             IERC20(rewardsToken).safeTransfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);
         }
@@ -189,7 +189,7 @@ contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausa
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = lastTimeRewardApplicable();
         if (account != address(0)) {
-            rewards[account] = earned(account);
+            rewards[rewardsToken][account] = earned(account);
             userRewardPerTokenPaid[account] = rewardPerTokenStored;
         }
         _;

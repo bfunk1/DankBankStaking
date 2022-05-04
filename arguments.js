@@ -1,1 +1,7 @@
-module.exports = ["0x8dd94d36932ae66a96c01be4d8f76b3734f590a9"];
+module.exports = [
+    "0x8dd94d36932ae66a96c01be4d8f76b3734f590a9",
+    "0x93E46118165e6b32B83e5C8931B1291a7D1C53f2",
+    "0x93E46118165e6b32B83e5C8931B1291a7D1C53f2",
+    1,
+];
+z;
