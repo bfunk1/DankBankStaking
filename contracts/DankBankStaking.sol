@@ -6,12 +6,13 @@ import "@openzeppelin/contracts/interfaces/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 // Inheritance
 import "./RewardsDistributionRecipient.sol";
 import "./Pausable.sol";
 
-contract DankBankStaking is RewardsDistributionRecipient, ReentrancyGuard, Pausable {
+contract DankBankStaking is ERC1155Holder, RewardsDistributionRecipient, ReentrancyGuard, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
