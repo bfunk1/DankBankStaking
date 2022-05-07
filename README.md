@@ -43,8 +43,3 @@ Then, run the verify task, passing the address of the contract replacing `DEPLOY
 ```shell
 npx hardhat verify --constructor-args arguments.js --network <NETWORK_NAME> <DEPLOYED_CONTRACT_ADDRESS>
 ```
-
-### Notes
-
-Test Staking Factory Contract on mumbai: 0xBCb0b8a9F64738CBd197F27dCd71Aceb1C7B7c52
-Test Staking Contract on mumbai: 0x79BE5496D1F8136C85DaCe417Df05DFe86fa71aE
