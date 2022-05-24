@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import "./IDankBankMarketGSN.sol";
 
 // Inheritance
 import "./RewardsDistributionRecipient.sol";
@@ -27,6 +28,9 @@ contract DankBankStaking is ERC1155Holder, RewardsDistributionRecipient, Reentra
     uint256 public rewardsDuration = 1 hours;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
+    uint256 private initialMemeBalance;
+    uint256 private initialTokenBalance;
+    address private marketAddress;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => mapping(address => uint256)) public rewards;
@@ -54,7 +58,11 @@ contract DankBankStaking is ERC1155Holder, RewardsDistributionRecipient, Reentra
         address _rewardToken,
         address _stakingToken,
         uint256 _lpTokenId,
-        uint256 _rewardRate
+        uint256 _rewardRate,
+        uint256 _initialMemeBalance,
+        uint256 _initialTokenBalance,
+        address _marketAddress
+
     ) Owned(_owner) {
         rewardToken = _rewardToken;
         memeToken = _memeToken;
@@ -62,6 +70,9 @@ contract DankBankStaking is ERC1155Holder, RewardsDistributionRecipient, Reentra
         lpTokenId = _lpTokenId;
         periodFinish = block.timestamp + 156 weeks;
         rewardRate = _rewardRate;
+        initialMemeBalance = _initialMemeBalance;
+        initialTokenBalance = _initialTokenBalance;
+        marketAddress = _marketAddress;
     }
 
     /* ========== VIEWS ========== */
@@ -198,4 +209,14 @@ contract DankBankStaking is ERC1155Holder, RewardsDistributionRecipient, Reentra
         }
         _;
     }
+    modifier updateRewardRate(address marketAdress, address memeToken) {
+        uint256 marketTokenBalance = IDankBankMarketGSN(marketAddress).getTotalTokenPoolSupply(memeToken);
+        uint256 marketMemeBalance = IERC20(memeToken).balanceOf(marketAddress);
+        uint256 rewardRateD = marketTokenBalance.mul(initialMemeBalance).mul(rewardsDuration);
+        uint256 rewardRateN = marketMemeBalance.mul(initialTokenBalance).mul(reward);
+        rewardRate = rewardRateN.div(rewardRateD);
+        
+        _;
+    }
+
 }

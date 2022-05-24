@@ -12,10 +12,15 @@ async function main() {
     const stakingToken = "0xFc509DB19c008D851F1823961B541b65FbEf43ff";
     const lpTokenId = BigNumber.from("844314671304614845033216911081071804793522770930");
     const rewardRate = 10;
+    const initialMemeBalance = 400;
+    const initialTokenBalance = 1000;
+    const marketAddress = "0x64C5CD052dc212E774f6d46f0d1845d457D02981";
+
+
 
     const dankBankStaking = await deployments.deploy("DankBankStaking", {
         from: deployer.address,
-        args: [deployer.address, memeToken, rewardToken, stakingToken, lpTokenId, rewardRate],
+        args: [deployer.address, memeToken, rewardToken, stakingToken, lpTokenId, rewardRate, initialMemeBalance, initialTokenBalance],
         log: true,
     });
 
